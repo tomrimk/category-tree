@@ -1,0 +1,6 @@
+<h2>Recursive Tree</h2>
+
+<app-tree-node
+  *ngFor="let node of tree; trackBy: trackByNodeId"
+  [node]="node"
+></app-tree-node>

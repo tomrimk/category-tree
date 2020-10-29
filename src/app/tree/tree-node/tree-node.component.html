@@ -1,0 +1,18 @@
+<div>
+  - {{ node.name }}
+  <button class="node-button" (click)="toggleChildInput()">+</button>
+</div>
+
+<input
+  *ngIf="isAddChildInputVisible"
+  class="node-input"
+  type="text"
+  name="child-value"
+  (change)="addChild($event)"
+/>
+
+<app-tree-node
+  *ngFor="let child of node.children"
+  class="node-child"
+  [node]="child"
+></app-tree-node>

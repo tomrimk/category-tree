@@ -1,0 +1,18 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.node {
+  &-child {
+    margin-left: 20px;
+  }
+
+  &-button {
+    width: 25px;
+  }
+
+  &-input {
+    width: 100px;
+  }
+}
