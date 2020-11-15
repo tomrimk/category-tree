@@ -4,11 +4,17 @@ import { CommonModule } from "@angular/common";
 import { TreeNodeComponent } from "./tree-node/tree-node.component";
 import { FormsModule } from "@angular/forms";
 import { IterativeTreeComponent } from "./iterative-tree/iterative-tree.component";
+import { IterativeTreeNodeComponent } from "./iterative-tree-node/iterative-tree-node.component";
 
 @NgModule({
-  declarations: [RecursiveComponent, TreeNodeComponent, IterativeTreeComponent],
+  declarations: [
+    RecursiveComponent,
+    TreeNodeComponent,
+    IterativeTreeComponent,
+    IterativeTreeNodeComponent,
+  ],
   imports: [CommonModule, FormsModule],
   exports: [RecursiveComponent, IterativeTreeComponent],
-  entryComponents: [TreeNodeComponent],
+  entryComponents: [TreeNodeComponent, IterativeTreeNodeComponent],
 })
 export class TreeModule {}

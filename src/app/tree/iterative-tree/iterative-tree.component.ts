@@ -4,52 +4,83 @@ import {
   ViewChild,
   ViewContainerRef,
   OnInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  ComponentRef,
+  Injector,
 } from "@angular/core";
 import { treeMock } from "./../mocks/tree";
-import { TreeNodeComponent } from "./../tree-node/tree-node.component";
 import { ITreeNode } from "./../models/tree-node.interface";
+import { IterativeTreeNodeComponent } from "../iterative-tree-node/iterative-tree-node.component";
 
 @Component({
   selector: "app-iterative-tree",
   templateUrl: "iterative-tree.component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IterativeTreeComponent implements OnInit {
-  public tree = treeMock;
+  public tree: ITreeNode[] = treeMock;
+  public treeNodeCache = new Map<
+    string,
+    ComponentRef<IterativeTreeNodeComponent>
+  >();
   public renderedTree = null;
 
   @ViewChild("treeContainer", { read: ViewContainerRef, static: true })
-  public treeContainer;
+  public treeContainer: ViewContainerRef;
 
-  constructor(private resolver: ComponentFactoryResolver) {}
+  constructor(
+    private resolver: ComponentFactoryResolver,
+    private cd: ChangeDetectorRef,
+    private injector: Injector
+  ) {}
 
   public ngOnInit(): void {
     this.generateTreeStructure();
   }
 
-  public generateTreeStructure(): void {
-    let stack = [...this.tree];
+  private generateTreeStructure(): void {
+    let queue = [...this.tree];
     let node: ITreeNode;
 
-    while (stack.length > 0) {
-      node = stack.shift();
+    while (queue.length > 0) {
+      node = queue.shift();
 
-      if (!node.children.length) {
-        this.createTreeNodeComponent(node);
-
-        return;
+      if (node.parent) {
+        this.insertNodeIntoParent(node);
+      } else {
+        this.createRootNode(node, this.treeContainer);
       }
 
-      this.createTreeNodeComponent(node);
-
-      for (let i = 0; i < node.children.length; i += 1) {
-        stack.push(node.children[i]);
-      }
+      node.children.forEach((child) => {
+        queue.push(child);
+      });
     }
   }
 
-  private createTreeNodeComponent(node: ITreeNode): void {
-    const factory = this.resolver.resolveComponentFactory(TreeNodeComponent);
-    const treeNodeComponentRef = this.treeContainer.createComponent(factory);
-    treeNodeComponentRef.instance.node = node;
+  private createRootNode(node: ITreeNode, viewRef: ViewContainerRef): void {
+    this.createNode(node, viewRef);
+  }
+
+  private insertNodeIntoParent(nodeToAdd: ITreeNode): void {
+    const parentComponentRef = this.treeNodeCache.get(nodeToAdd.parent);
+
+    this.createNode(nodeToAdd, parentComponentRef.instance.childViewRef);
+  }
+
+  private createNode(node: ITreeNode, viewRef: ViewContainerRef): void {
+    const factory = this.resolver.resolveComponentFactory(
+      IterativeTreeNodeComponent
+    );
+    const componentRef = factory.create(this.injector);
+    componentRef.instance.node = node;
+
+    viewRef.insert(componentRef.hostView);
+
+    if (!this.treeNodeCache.has(node.id)) {
+      this.treeNodeCache.set(node.id, componentRef);
+    }
+
+    this.cd.detectChanges();
   }
 }

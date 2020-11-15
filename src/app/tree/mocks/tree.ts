@@ -2,22 +2,33 @@ export const treeMock = [
   {
     id: "1",
     name: "first",
-    children: [{ id: "1-1", name: "first inner", children: [] }],
+    parent: null,
+    children: [{ id: "1-1", name: "first inner", parent: "1", children: [] }],
   },
   {
     id: "2",
     name: "second",
+    parent: null,
     children: [
       {
         id: "2-1",
         name: "second inner",
-        children: [{ id: "2-1-1", name: "second inner inner", children: [] }],
+        parent: "2",
+        children: [
+          {
+            id: "2-1-1",
+            parent: "2-1",
+            name: "second inner inner",
+            children: [],
+          },
+        ],
       },
     ],
   },
   {
     id: "3",
     name: "third",
-    children: [{ id: "3-1", name: "third inner", children: [] }],
+    parent: null,
+    children: [{ id: "3-1", name: "third inner", parent: "3", children: [] }],
   },
 ];
